@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        Hello from Facelets
+
+        <h:form id="ShowEventsForm">
+            <p:dataTable var="item" value="#{EventBean.evList}" reflow="true" rows="5" paginator="true" paginatorPosition="bottom" 
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+
+                <p:columnGroup type="header">
+                    <p:row>
+
+                        <p:column colspan="4" headerText="Events" />
+
+
+                    </p:row>
+                    <p:row>
+                        <p:column headerText="EventID" />
+                        <p:column headerText="EventTitle" />
+                        <p:column headerText="EventDate" />
+                        <p:column headerText="EventDescription" />
+
+
+                    </p:row>
+                </p:columnGroup>
+                <p:column><h:outputText value="#{item.itemNo}"/></p:column>
+                <p:column><h:outputText value="#{item.homeCourseId}"/></p:column>
+                <p:column><h:outputText value="#{item.homeCourseTitle}"/></p:column>
+                <p:column><h:outputText value="#{item.homeCourseCredits}"/></p:column>
+                <p:column><h:outputText value="#{item.hostCourseId}"/></p:column>
+                <p:column><h:outputText value="#{item.hostCourseTitle}"/></p:column>
+                <p:column><h:outputText value="#{item.hostCourseCredits}"/></p:column> 
+                <p:column>
+                    <h:commandLink action="#{learningAgreementBean.doDeleteLearningAgreementItem(item.itemNo)}"
+                                   immediate="true" rendered="#{item.renderedDeleteButton}"
+                                   title="Delete the selected Learning Agreement Item">
+                        <h:outputText value="Delete"/>
+                    </h:commandLink>
+                </p:column>
+            </p:dataTable> 
+
+            <div class="p-col-12 p-md-6 p-lg-4">
+
+                <p:commandButton value="Login" id="loginButton" title="Login to System" validateClient="true"
+                                 action="#{EventBean.getListOfEvents}" update="@form"/>  
+
+            </div>
+        </h:form>
+    </h:body>
+</html>
+

@@ -1,0 +1,184 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title>Eventübersicht</title>
+    </h:head>
+
+
+
+    <h:body>
+
+
+
+        <p:outputPanel deferred="true">
+
+            <h1>Eventübersicht</h1>
+
+        </p:outputPanel>
+
+
+        <br/>
+        
+        <div class="card crud-demo">
+            <h:form id="form">
+                <p:growl id="messages" showDetail="true" />
+
+                <p:toolbar>
+                    <p:toolbarGroup>
+                        <p:commandButton value="Neues Event" icon="pi pi-plus" actionListener="#{crudView.openNew}"
+                                         update=":dialogs:manage-event-content" oncomplete="PF('createEventDialog').show()"
+                                         styleClass="ui-button-success" style="margin-right: .5rem">
+                            <p:resetInput target=":dialogs:manage-event-content" />
+                        </p:commandButton>
+                        </p:toolbarGroup>
+                    <p:toolbarGroup align="middle">
+                        <p:outputPanel deferred="true">                           
+                            <h3>Momentan sind #{eventBean.eventCount} Events geplant.</h3>
+                            <h4>#{restClient.call()} (powered by Webservice)</h4>
+                        </p:outputPanel>
+                    </p:toolbarGroup>
+                    <p:toolbarGroup align="right">
+                        
+                        <p:commandButton value="Export" icon="pi pi-upload" styleClass="ui-button-help" ajax="false">
+                            <p:dataExporter type="pdf" target="dt-events" fileName="events" />
+                        </p:commandButton>
+                    
+                    <p:spacer width="20" height="20"/>
+                    <p:commandButton type="button" value="Abmelden" styleClass="ui-button-secondary" onclick="location.href='logout.xhtml'">
+                            
+                        </p:commandButton>
+                    </p:toolbarGroup>
+                </p:toolbar>
+                <br/>
+                <br/>
+                <p:dataTable id="dt-events" widgetVar="dtEvents" var="event" value="#{eventBean.listOfEvents}"
+                             reflow="true" styleClass="products-table" selection="#{crudView.selectedEvent}"
+                             rowKey="#{event.eventID}" paginator="true" rows="10" rowSelectMode="add" paginatorPosition="bottom">
+                    <f:facet name="header">
+                        <div class="products-table-header">
+                            <span style="font-size: large">Events</span> <span
+                                class="filter-container ui-input-icon-left"> <i class="pi pi-search"></i> <p:inputText
+                                    id="globalFilter" onkeyup="PF('dtEvents').filter()" placeholder="Search" />
+                            </span>
+
+                        </div>
+                    </f:facet>
+
+                    <!-- <p:ajax event="rowSelect" update=":form:delete-products-button" />
+                     <p:ajax event="rowUnselect" update=":form:delete-products-button" />
+                     <p:ajax event="rowSelectCheckbox" update=":form:delete-products-button" />
+                     <p:ajax event="rowUnselectCheckbox" update=":form:delete-products-button" />
+                     <p:ajax event="toggleSelect" update=":form:delete-products-button" />-->
+
+
+
+                    <p:column headerText="ID" sortBy="#{event.eventID}" filterBy="#{event.eventID}">
+                        <h:outputText value="#{event.eventID}" />
+                    </p:column>
+                    <p:column headerText="Titel" sortBy="#{event.eventTitle}" filterBy="#{event.eventTitle}">
+                        <h:outputText value="#{event.eventTitle}" style="font-weight: 700" />
+                    </p:column>                                       
+                    <p:column headerText="Datum" sortBy="#{event.eventDate}" filterBy="#{event.eventDate}">
+                        <h:outputText value="#{event.eventDate}" />
+                    </p:column>
+                    <p:column headerText="Beschreibung" sortBy="#{event.eventDescription}" filterBy="#{event.eventDescription}">
+                        <h:outputText value="#{event.eventDescription}" />
+                    </p:column>
+
+                    <p:column exportable="false">
+                        <p:commandButton icon="pi pi-pencil" update=":dialogs:manage-product-content"
+                                         oncomplete="PF('manageProductDialog').show()"
+                                         styleClass="edit-button rounded-button ui-button-success" process="@this">
+                            <f:setPropertyActionListener value="#{event}" target="#{crudView.selectedEvent}" />
+                            <p:resetInput target=":dialogs:manage-product-content" />
+                        </p:commandButton>
+                        <p:commandButton class="ui-button-warning rounded-button" icon="pi pi-trash" process="@this"
+                                         oncomplete="PF('deleteProductDialog').show()">
+                            <f:setPropertyActionListener value="#{event}" target="#{crudView.selectedEvent}" />
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </h:form>
+
+            <h:form id="dialogs">
+                <p:dialog header="Event bearbeiten" showEffect="fade" modal="true" widgetVar="manageProductDialog"
+                          responsive="true">
+                    <p:outputPanel id="manage-product-content" class="ui-fluid">
+                        <p:outputPanel rendered="#{not empty crudView.selectedEvent}">
+
+                            <div class="field">
+                                <p:outputLabel for="title">Titel</p:outputLabel>
+                                <p:inputText id="title" value="#{crudView.selectedEvent.eventTitle}" required="true" />
+                            </div>
+                            <div class="field col-12 md:col-4">
+                                <p:outputLabel for="date">Datum</p:outputLabel>
+                                <p:datePicker id="date" value="#{crudView.selectedEvent.eventDate}" showTime="true" locale="de" pattern="dd.MM.yyyy"/>
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="description">Beschreibung</p:outputLabel>
+                                <p:inputTextarea id="description" value="#{crudView.selectedEvent.eventDescription}" />
+                            </div>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Speichern" icon="pi pi-check" actionListener="#{crudView.updateEvent()}"
+                                         update="manage-product-content" process="manage-product-content @this" onclick="PF('manageProductDialog').hide()" />
+                        <p:commandButton value="Abbrechen" icon="pi pi-times" onclick="PF('manageProductDialog').hide()"
+                                         class="ui-button-secondary" type="button" />
+                    </f:facet>
+                </p:dialog>
+
+                <p:dialog header="Neues Event erstellen" showEffect="fade" modal="true" widgetVar="createEventDialog"
+                          responsive="true">
+                    <p:outputPanel id="manage-event-content" class="ui-fluid">
+                        <p:outputPanel rendered="#{not empty crudView.selectedEvent}">
+
+                            <div class="field">
+                                <p:outputLabel for="evTitle">Titel</p:outputLabel>
+                                <p:inputText id="evTitle" value="#{crudView.selectedEvent.eventTitle}" required="true" />
+                            </div>
+                            <div class="field col-12 md:col-4">
+                                <p:outputLabel for="evDate">Datum</p:outputLabel>
+                                <p:datePicker id="evDate" value="#{crudView.selectedEvent.eventDate}" showTime="true" locale="de" pattern="dd.MM.yyyy"/>
+                            </div>
+                            <div class="field">
+                                <p:outputLabel for="evDescription">Beschreibung</p:outputLabel>
+                                <p:inputTextarea id="evDescription" value="#{crudView.selectedEvent.eventDescription}" />
+                            </div>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="Speichern" icon="pi pi-check" actionListener="#{crudView.saveEvent()}"
+                                         update="manage-event-content" process="manage-event-content @this" onclick="PF('createEventDialog').hide()" />
+                        <p:commandButton value="Abbrechen" icon="pi pi-times" onclick="PF('createEventDialog').hide()"
+                                         class="ui-button-secondary" type="button" />
+                    </f:facet>
+                </p:dialog>
+                
+                <p:confirmDialog widgetVar="deleteProductDialog" showEffect="fade" width="300"
+                                 message="Möchtest du das Event wirklich löschen?" header="Event löschen" severity="warn">
+                    <p:commandButton value="Löschen" icon="pi pi-check" actionListener="#{crudView.deleteEvent()}"
+                                     process="@this" oncomplete="PF('deleteProductDialog').hide()" />
+                    <p:commandButton value="Abbrechen" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                     onclick="PF('deleteProductDialog').hide()" />
+                </p:confirmDialog>
+
+                <p:confirmDialog global="true" showEffect="fade" width="300">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check" />
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-secondary"
+                                     icon="pi pi-times" />
+                </p:confirmDialog>
+            </h:form>
+        </div>
+
+    </h:body>
+</html>
